@@ -35,6 +35,18 @@
                             Margin="0,0,12,0" 
                             VerticalAlignment="Center"
                             WindowChrome.IsHitTestVisibleInChrome="True">
+                    <ui:Button Command="{Binding CheckForUpdatesCommand}" 
+                               Background="{DynamicResource AppControlBackgroundBrush}"
+                               BorderBrush="{DynamicResource AppControlBorderBrush}"
+                               BorderThickness="1"
+                               Padding="10,4" 
+                               Margin="0,0,8,0"
+                               ToolTip="Check for RigForge App Updates">
+                        <TextBlock Text="🔄 Check Updates" 
+                                   Foreground="{DynamicResource AppTextPrimaryBrush}" 
+                                   FontSize="11" 
+                                   FontWeight="SemiBold" />
+                    </ui:Button>
                     <ui:Button Command="{Binding ToggleThemeCommand}" 
                                Background="{DynamicResource AppControlBackgroundBrush}"
                                BorderBrush="{DynamicResource AppControlBorderBrush}"
@@ -55,11 +67,88 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
+            <!-- Row 0: Update Notification Banner (Visible when new version is available) -->
+            <Border Grid.Row="0"
+                    Visibility="{Binding IsUpdateBannerVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                    Background="{DynamicResource AppCardBackgroundBrush}"
+                    BorderBrush="#3B82F6"
+                    BorderThickness="1.5"
+                    CornerRadius="10"
+                    Margin="0,0,0,12"
+                    Padding="14,10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" 
+                            Background="#2563EB" 
+                            CornerRadius="8" 
+                            Width="36" 
+                            Height="36" 
+                            Margin="0,0,12,0" 
+                            VerticalAlignment="Center">
+                        <TextBlock Text="🚀" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,12,0">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="New RigForge Update Available: " 
+                                       FontWeight="Bold" 
+                                       FontSize="13" 
+                                       Foreground="{DynamicResource AppTextPrimaryBrush}" />
+                            <TextBlock Text="{Binding AvailableUpdateVersion}" 
+                                       FontWeight="Bold" 
+                                       FontSize="13" 
+                                       Foreground="#38BDF8" />
+                            <Border Background="#10B981" CornerRadius="4" Padding="6,1" Margin="8,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="Ready to Install" FontSize="10" FontWeight="Bold" Foreground="White" />
+                            </Border>
+                        </StackPanel>
+
+                        <TextBlock Text="{Binding UpdateStatusText}" 
+                                   Foreground="{DynamicResource AppTextSecondaryBrush}" 
+                                   FontSize="12" 
+                                   Margin="0,2,0,0" 
+                                   TextTrimming="CharacterEllipsis" />
+
+                        <!-- Download Progress Bar -->
+                        <Grid Visibility="{Binding IsDownloadingUpdate, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="0,6,0,0">
+                            <ProgressBar Value="{Binding UpdateDownloadProgress}" Maximum="100" Height="6" />
+                        </Grid>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <ui:Button Command="{Binding ApplyUpdateCommand}"
+                                   Appearance="Primary"
+                                   Visibility="{Binding IsDownloadingUpdate, Converter={StaticResource InverseBooleanConverter}}"
+                                   Padding="14,6"
+                                   Margin="0,0,8,0"
+                                   ToolTip="Download and install update automatically">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="⬇ " FontSize="12" Foreground="White" />
+                                <TextBlock Text="Update &amp; Restart" FontWeight="Bold" Foreground="White" />
+                            </StackPanel>
+                        </ui:Button>
+
+                        <ui:Button Command="{Binding DismissUpdateBannerCommand}"
+                                   Appearance="Secondary"
+                                   Padding="8,6"
+                                   ToolTip="Dismiss notification">
+                            <TextBlock Text="✕" FontSize="11" Foreground="{DynamicResource AppTextSecondaryBrush}" />
+                        </ui:Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
             <!-- Top Header & Hero Controls -->
-            <Grid Grid.Row="0" Margin="0,0,0,14">
+            <Grid Grid.Row="1" Margin="0,0,0,14">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
@@ -251,7 +340,7 @@
             </Grid>
 
             <!-- Filter, Presets & Search Toolbar -->
-            <Grid Grid.Row="1" Margin="0,0,0,12">
+            <Grid Grid.Row="2" Margin="0,0,0,12">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -398,7 +487,7 @@
             </Grid>
 
             <!-- Applications Grid Cards View -->
-            <ScrollViewer Grid.Row="2" 
+            <ScrollViewer Grid.Row="3" 
                           VerticalScrollBarVisibility="Auto" 
                           HorizontalScrollBarVisibility="Disabled">
                 <ItemsControl ItemsSource="{Binding FilteredPackages}">

@@ -19,6 +19,7 @@ namespace RigForge.ViewModels;
 public class MainViewModel : ObservableObject
 {
     private readonly IWingetService _wingetService;
+    private readonly IUpdateService _updateService;
     private CancellationTokenSource? _cts;
 
     private string _searchText = string.Empty;
@@ -32,6 +33,14 @@ public class MainViewModel : ObservableObject
     private int _installedCount;
     private bool _isDarkTheme = true;
     private bool _isLogVisible = false;
+
+    // Self-update properties
+    private bool _isUpdateBannerVisible;
+    private string _availableUpdateVersion = string.Empty;
+    private string _updateStatusText = string.Empty;
+    private bool _isDownloadingUpdate;
+    private double _updateDownloadProgress;
+    private UpdateInfo? _pendingUpdate;
 
     public ObservableCollection<SoftwarePackage> AllPackages { get; } = new();
     public ICollectionView FilteredPackages { get; }
@@ -126,6 +135,36 @@ public class MainViewModel : ObservableObject
         set => SetProperty(ref _isLogVisible, value);
     }
 
+    public bool IsUpdateBannerVisible
+    {
+        get => _isUpdateBannerVisible;
+        set => SetProperty(ref _isUpdateBannerVisible, value);
+    }
+
+    public string AvailableUpdateVersion
+    {
+        get => _availableUpdateVersion;
+        set => SetProperty(ref _availableUpdateVersion, value);
+    }
+
+    public string UpdateStatusText
+    {
+        get => _updateStatusText;
+        set => SetProperty(ref _updateStatusText, value);
+    }
+
+    public bool IsDownloadingUpdate
+    {
+        get => _isDownloadingUpdate;
+        set => SetProperty(ref _isDownloadingUpdate, value);
+    }
+
+    public double UpdateDownloadProgress
+    {
+        get => _updateDownloadProgress;
+        set => SetProperty(ref _updateDownloadProgress, value);
+    }
+
     public ICommand SelectAllCommand { get; }
     public ICommand DeselectAllCommand { get; }
     public ICommand SelectCategoryCommand { get; }
@@ -139,10 +178,14 @@ public class MainViewModel : ObservableObject
     public ICommand ToggleThemeCommand { get; }
     public ICommand ToggleLogsCommand { get; }
     public ICommand ApplyPresetCommand { get; }
+    public ICommand ApplyUpdateCommand { get; }
+    public ICommand DismissUpdateBannerCommand { get; }
+    public ICommand CheckForUpdatesCommand { get; }
 
-    public MainViewModel(IWingetService wingetService)
+    public MainViewModel(IWingetService wingetService, IUpdateService? updateService = null)
     {
         _wingetService = wingetService;
+        _updateService = updateService ?? new UpdateService();
 
         FilteredPackages = CollectionViewSource.GetDefaultView(AllPackages);
         FilteredPackages.Filter = FilterPackage;
@@ -175,6 +218,10 @@ public class MainViewModel : ObservableObject
         ToggleThemeCommand = new RelayCommand(ToggleTheme);
         ToggleLogsCommand = new RelayCommand(() => IsLogVisible = !IsLogVisible);
 
+        ApplyUpdateCommand = new AsyncRelayCommand(ApplyUpdateAsync, () => !IsDownloadingUpdate && _pendingUpdate != null);
+        DismissUpdateBannerCommand = new RelayCommand(() => IsUpdateBannerVisible = false);
+        CheckForUpdatesCommand = new AsyncRelayCommand(ManualCheckForUpdatesAsync);
+
         InitializeData();
     }
 
@@ -182,6 +229,7 @@ public class MainViewModel : ObservableObject
     {
         LoadApps();
         _ = CheckWingetAndScanAsync();
+        _ = CheckForUpdatesSilentlyAsync();
     }
 
     private void LoadApps()
@@ -675,5 +723,92 @@ public class MainViewModel : ObservableObject
         }
 
         return true;
+    }
+
+    private async Task CheckForUpdatesSilentlyAsync()
+    {
+        try
+        {
+            var update = await _updateService.CheckForUpdatesAsync();
+            if (update != null && update.IsUpdateAvailable)
+            {
+                _pendingUpdate = update;
+                AvailableUpdateVersion = $"v{update.LatestVersion}";
+                UpdateStatusText = string.IsNullOrWhiteSpace(update.ReleaseTitle)
+                    ? $"A new version of RigForge ({AvailableUpdateVersion}) is ready to download."
+                    : $"{update.ReleaseTitle} ({AvailableUpdateVersion}) is available.";
+                IsUpdateBannerVisible = true;
+                (ApplyUpdateCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
+                AddLog($"A new update for RigForge ({AvailableUpdateVersion}) was detected.", LogLevel.Info);
+            }
+        }
+        catch
+        {
+            // Silently ignore background check failures
+        }
+    }
+
+    public async Task ManualCheckForUpdatesAsync()
+    {
+        AddLog("Checking for RigForge updates...", LogLevel.Info);
+        StatusMessage = "Checking for RigForge updates...";
+
+        try
+        {
+            var update = await _updateService.CheckForUpdatesAsync();
+            if (update != null && update.IsUpdateAvailable)
+            {
+                _pendingUpdate = update;
+                AvailableUpdateVersion = $"v{update.LatestVersion}";
+                UpdateStatusText = string.IsNullOrWhiteSpace(update.ReleaseTitle)
+                    ? $"A new version of RigForge ({AvailableUpdateVersion}) is ready to download."
+                    : $"{update.ReleaseTitle} ({AvailableUpdateVersion}) is available.";
+                IsUpdateBannerVisible = true;
+                (ApplyUpdateCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
+                StatusMessage = $"Update available: {AvailableUpdateVersion}";
+                AddLog($"Update available: {AvailableUpdateVersion}", LogLevel.Success);
+            }
+            else
+            {
+                StatusMessage = "RigForge is up to date.";
+                AddLog($"RigForge is up to date (current version: v{_updateService.CurrentVersion}).", LogLevel.Success);
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = "Could not check for updates.";
+            AddLog($"Update check error: {ex.Message}", LogLevel.Warning);
+        }
+    }
+
+    private async Task ApplyUpdateAsync()
+    {
+        if (_pendingUpdate == null || string.IsNullOrWhiteSpace(_pendingUpdate.DownloadUrl)) return;
+
+        IsDownloadingUpdate = true;
+        UpdateDownloadProgress = 0;
+        UpdateStatusText = "Connecting to download server...";
+        AddLog($"Downloading RigForge update ({AvailableUpdateVersion})...", LogLevel.Info);
+
+        var progress = new Progress<double>(p =>
+        {
+            UpdateDownloadProgress = p;
+        });
+
+        bool ok = await _updateService.DownloadAndApplyUpdateAsync(
+            _pendingUpdate.DownloadUrl,
+            progress,
+            msg =>
+            {
+                UpdateStatusText = msg;
+                AddLog(msg, LogLevel.Info);
+            });
+
+        if (!ok)
+        {
+            IsDownloadingUpdate = false;
+            UpdateStatusText = "Update failed to download. Please check your internet connection.";
+            AddLog("Update failed to download or install.", LogLevel.Error);
+        }
     }
 }

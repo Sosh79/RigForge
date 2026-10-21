@@ -154,4 +154,47 @@ public class HubTests
         Assert.True(telegram.IsInstalled);
         Assert.Equal("7.3.1.0", telegram.InstalledVersion);
     }
+
+    private class FakeUpdateService : IUpdateService
+    {
+        public string CurrentVersion => "1.0.0";
+        public UpdateInfo? MockUpdate { get; set; }
+
+        public Task<UpdateInfo?> CheckForUpdatesAsync(CancellationToken cancellationToken = default)
+            => Task.FromResult(MockUpdate);
+
+        public Task<bool> DownloadAndApplyUpdateAsync(
+            string downloadUrl, 
+            IProgress<double>? progress = null, 
+            Action<string>? statusCallback = null, 
+            CancellationToken cancellationToken = default)
+            => Task.FromResult(true);
+    }
+
+    [Fact]
+    public async Task ManualCheckForUpdates_DisplaysBannerWhenNewVersionAvailable()
+    {
+        var fakeWinget = new FakeWingetService();
+        var fakeUpdate = new FakeUpdateService
+        {
+            MockUpdate = new UpdateInfo
+            {
+                IsUpdateAvailable = true,
+                CurrentVersion = "1.0.0",
+                LatestVersion = "1.1.0",
+                ReleaseTitle = "RigForge v1.1.0",
+                DownloadUrl = "https://github.com/Sosh79/RigForge/releases/download/v1.1.0/RigForge.exe"
+            }
+        };
+
+        var vm = new MainViewModel(fakeWinget, fakeUpdate);
+        await vm.ManualCheckForUpdatesAsync();
+
+        Assert.True(vm.IsUpdateBannerVisible);
+        Assert.Equal("v1.1.0", vm.AvailableUpdateVersion);
+        Assert.True(vm.ApplyUpdateCommand.CanExecute(null));
+
+        vm.DismissUpdateBannerCommand.Execute(null);
+        Assert.False(vm.IsUpdateBannerVisible);
+    }
 }
