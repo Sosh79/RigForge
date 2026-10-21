@@ -161,6 +161,48 @@ public static class AppDetectionHelper
         if (normPkgId == "voidtools.everything" && normInstalledName.StartsWith("everything"))
             return true;
 
+        if (normPkgId == "bytedance.capcut" && (normInstalledName.Contains("capcut") || normInstalledId.Contains("capcut")))
+            return true;
+
+        if (normPkgId == "google.antigravity" && (normInstalledName.StartsWith("antigravity") && !normInstalledName.Contains("ide")))
+            return true;
+
+        if (normPkgId == "google.antigravityide" && normInstalledName.Contains("antigravity ide"))
+            return true;
+
+        if ((normPkgId == "wisprflow.wisprflow" || normPkgId == "9pnt7hr375bw") && (normInstalledName.Contains("wispr flow") || normInstalledName.Contains("wisprflow") || normInstalledId.Contains("wisprflow")))
+            return true;
+
+        if (normPkgId == "sst.opencodedesktop" && (normInstalledName.Contains("opencode") || normInstalledId.Contains("opencode")))
+            return true;
+
+        if (normPkgId == "zhipuai.zcode" && (normInstalledName.Contains("zcode") || normInstalledId.Contains("zcode")))
+            return true;
+
+        if (normPkgId == "anthropic.claude" && (normInstalledName.Contains("claude") || normInstalledId.Contains("claude")))
+            return true;
+
+        if ((normPkgId == "9plm9xgg6vks" || normPkgId == "openai.chatgpt") && (normInstalledName.Contains("chatgpt") || normInstalledId.Contains("chatgpt")))
+            return true;
+
+        if (normPkgId == "openai.codex" && (normInstalledName.Contains("codex") || normInstalledId.Contains("codex")))
+            return true;
+
+        if (normPkgId == "ubisoft.connect" && (normInstalledName.Contains("ubisoft connect") || normInstalledName.Contains("uplay") || normInstalledId.Contains("uplay")))
+            return true;
+
+        if (normPkgId == "electronicarts.eadesktop" && (normInstalledName.Contains("ea app") || normInstalledName.Contains("ea desktop") || normInstalledId.Contains("eadesktop")))
+            return true;
+
+        if (normPkgId.StartsWith("openjs.nodejs") && (normInstalledName.StartsWith("node.js") || normInstalledName.Contains("nodejs") || normInstalledId.Contains("nodejs")))
+            return true;
+
+        if (normPkgId == "mongodb.compass.full" && (normInstalledName.Contains("mongodb compass") || normInstalledId.Contains("mongodbcompass") || normInstalledId.Contains("mongodb.compass")))
+            return true;
+
+        if (normPkgId == "oracle.mysql" && (normInstalledName.StartsWith("mysql server") || normInstalledName.Contains("mysql server") || normInstalledId.Contains("mysql")))
+            return true;
+
         return false;
     }
 }

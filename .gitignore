@@ -54,3 +54,7 @@ $RECYCLE.BIN/
 # JetBrains / Rider / VS Code user settings
 .idea/
 *.DotSettings.user
+
+# Cloudflare & Wrangler
+.wrangler/
+

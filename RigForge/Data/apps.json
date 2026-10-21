@@ -84,6 +84,13 @@
     "Icon": "Code24"
   },
   {
+    "Id": "OpenJS.NodeJS",
+    "Name": "Node.js (Current)",
+    "Category": "Development",
+    "Description": "JavaScript runtime built on Chrome's V8 engine featuring the latest language innovations.",
+    "Icon": "Code24"
+  },
+  {
     "Id": "Python.Python.3.12",
     "Name": "Python 3.12",
     "Category": "Development",
@@ -116,6 +123,55 @@
     "Name": "DBeaver Community",
     "Category": "Development",
     "Description": "Free universal database manager supporting MySQL, Postgres, SQLite, and more.",
+    "Icon": "Database24"
+  },
+  {
+    "Id": "Google.Antigravity",
+    "Name": "Antigravity",
+    "Category": "Development",
+    "Description": "Google Antigravity autonomous AI agent coding workspace and assistant.",
+    "Icon": "Code24"
+  },
+  {
+    "Id": "Google.AntigravityIDE",
+    "Name": "Antigravity IDE",
+    "Category": "Development",
+    "Description": "Google Antigravity AI-native coding IDE and autonomous developer environment.",
+    "Icon": "Code24"
+  },
+  {
+    "Id": "SST.OpenCodeDesktop",
+    "Name": "OpenCode",
+    "Category": "Development",
+    "Description": "Open-source AI coding agent with desktop and terminal UI supporting multi-agent workflows.",
+    "Icon": "Code24"
+  },
+  {
+    "Id": "ZhipuAI.ZCode",
+    "Name": "ZCode",
+    "Category": "Development",
+    "Description": "AI-native code editor and development companion developed by Zhipu AI.",
+    "Icon": "Code24"
+  },
+  {
+    "Id": "OpenAI.Codex",
+    "Name": "Codex",
+    "Category": "Development",
+    "Description": "Terminal-based autonomous AI coding agent by OpenAI to plan, write, and execute code.",
+    "Icon": "Code24"
+  },
+  {
+    "Id": "MongoDB.Compass.Full",
+    "Name": "MongoDB Compass",
+    "Category": "Development",
+    "Description": "The official GUI for MongoDB to query, aggregate, and visualize your database.",
+    "Icon": "Database24"
+  },
+  {
+    "Id": "Oracle.MySQL",
+    "Name": "MySQL Server",
+    "Category": "Development",
+    "Description": "The world's most popular open-source relational database management system.",
     "Icon": "Database24"
   },
   {
@@ -252,6 +308,13 @@
     "Icon": "Filmstrip24"
   },
   {
+    "Id": "ByteDance.CapCut",
+    "Name": "CapCut",
+    "Category": "Media",
+    "Description": "All-in-one video editing software by ByteDance with intelligent AI features, effects, and transitions.",
+    "Icon": "MoviesAndTv24"
+  },
+  {
     "Id": "Discord.Discord",
     "Name": "Discord",
     "Category": "Communication",
@@ -329,6 +392,20 @@
     "Icon": "Games24"
   },
   {
+    "Id": "Ubisoft.Connect",
+    "Name": "Ubisoft Connect",
+    "Category": "Gaming & Runtimes",
+    "Description": "Ecosystem of player services and game launcher for all Ubisoft PC games.",
+    "Icon": "Games24"
+  },
+  {
+    "Id": "ElectronicArts.EADesktop",
+    "Name": "EA App",
+    "Category": "Gaming & Runtimes",
+    "Description": "Fast and optimized gaming platform and launcher for Electronic Arts PC titles.",
+    "Icon": "Games24"
+  },
+  {
     "Id": "TheDocumentFoundation.LibreOffice",
     "Name": "LibreOffice",
     "Category": "Productivity",
@@ -355,5 +432,26 @@
     "Category": "Productivity",
     "Description": "All-in-one workspace for notes, tasks, wikis, and team collaboration.",
     "Icon": "ClipboardTask24"
+  },
+  {
+    "Id": "WisprFlow.WisprFlow",
+    "Name": "Wispr Flow",
+    "Category": "Productivity",
+    "Description": "AI voice-to-text dictation that turns speech into clear, formatted writing across any application.",
+    "Icon": "Mic24"
+  },
+  {
+    "Id": "Anthropic.Claude",
+    "Name": "Claude",
+    "Category": "Productivity",
+    "Description": "Anthropic Claude official desktop application for AI conversation, reasoning, and analysis.",
+    "Icon": "Sparkle24"
+  },
+  {
+    "Id": "9PLM9XGG6VKS",
+    "Name": "ChatGPT",
+    "Category": "Productivity",
+    "Description": "Official OpenAI ChatGPT desktop application for Windows with advanced voice and desktop integration.",
+    "Icon": "Chat24"
   }
 ]

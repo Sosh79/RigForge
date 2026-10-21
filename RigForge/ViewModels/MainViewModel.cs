@@ -236,16 +236,35 @@ public class MainViewModel : ObservableObject
     {
         try
         {
+            string json = string.Empty;
             string jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "apps.json");
-            if (!File.Exists(jsonPath))
-            {
-                // Fallback to local dev path
-                jsonPath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "apps.json");
-            }
-
             if (File.Exists(jsonPath))
             {
-                string json = File.ReadAllText(jsonPath);
+                json = File.ReadAllText(jsonPath);
+            }
+            else
+            {
+                string devPath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "apps.json");
+                if (File.Exists(devPath))
+                {
+                    json = File.ReadAllText(devPath);
+                }
+            }
+
+            // Fallback: Load from embedded assembly resource (100% standalone single-file execution)
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                using var stream = assembly.GetManifestResourceStream("RigForge.Data.apps.json");
+                if (stream != null)
+                {
+                    using var reader = new StreamReader(stream);
+                    json = reader.ReadToEnd();
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(json))
+            {
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                 var packages = JsonSerializer.Deserialize<List<SoftwarePackage>>(json, options);
 
@@ -640,9 +659,9 @@ public class MainViewModel : ObservableObject
         var ids = presetName.ToLowerInvariant() switch
         {
             "essentials" => new[] { "Google.Chrome", "7zip.7zip", "VideoLAN.VLC", "Discord.Discord", "RARLab.WinRAR" },
-            "developer" => new[] { "Microsoft.VisualStudioCode", "Git.Git", "Microsoft.WindowsTerminal", "OpenJS.NodeJS.LTS", "Python.Python.3.12", "Docker.DockerDesktop", "voidtools.Everything", "7zip.7zip" },
-            "gaming" => new[] { "Valve.Steam", "EpicGames.EpicGamesLauncher", "Discord.Discord", "Microsoft.VCRedist.2015+.x64", "Microsoft.DirectX", "Opera.OperaGX" },
-            "creator" => new[] { "OBSProject.OBSStudio", "BlenderFoundation.Blender", "GIMP.GIMP", "Audacity.Audacity", "HandBrake.HandBrake", "ShareX.ShareX" },
+            "developer" => new[] { "Microsoft.VisualStudioCode", "Google.Antigravity", "Google.AntigravityIDE", "SST.OpenCodeDesktop", "ZhipuAI.ZCode", "OpenAI.Codex", "Git.Git", "Microsoft.WindowsTerminal", "OpenJS.NodeJS.LTS", "Python.Python.3.12", "Docker.DockerDesktop", "MongoDB.Compass.Full", "Oracle.MySQL", "voidtools.Everything", "7zip.7zip" },
+            "gaming" => new[] { "Valve.Steam", "EpicGames.EpicGamesLauncher", "Ubisoft.Connect", "ElectronicArts.EADesktop", "Discord.Discord", "Microsoft.VCRedist.2015+.x64", "Microsoft.DirectX", "Opera.OperaGX" },
+            "creator" => new[] { "ByteDance.CapCut", "OBSProject.OBSStudio", "BlenderFoundation.Blender", "GIMP.GIMP", "Audacity.Audacity", "HandBrake.HandBrake", "ShareX.ShareX" },
             _ => Array.Empty<string>()
         };
 
