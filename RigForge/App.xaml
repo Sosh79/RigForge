@@ -1,0 +1,40 @@
+<Application x:Class="RigForge.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:converters="clr-namespace:RigForge.Converters"
+             StartupUri="Views/MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- WPF-UI Fluent Dark / Light Theme & Styles -->
+                <ui:ThemesDictionary Theme="Dark" />
+                <ui:ControlsDictionary />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Adaptive High-Contrast Theme Brushes -->
+            <SolidColorBrush x:Key="AppPageBackgroundBrush" Color="#0B0F19" />
+            <SolidColorBrush x:Key="AppCardBackgroundBrush" Color="#151D2C" />
+            <SolidColorBrush x:Key="AppCardBorderBrush" Color="#26334D" />
+            <SolidColorBrush x:Key="AppTextPrimaryBrush" Color="#F8FAFC" />
+            <SolidColorBrush x:Key="AppTextSecondaryBrush" Color="#94A3B8" />
+            <SolidColorBrush x:Key="AppTextMutedBrush" Color="#64748B" />
+            <SolidColorBrush x:Key="AppControlBackgroundBrush" Color="#1A2333" />
+            <SolidColorBrush x:Key="AppControlBorderBrush" Color="#2D3B54" />
+            <SolidColorBrush x:Key="AppBadgeBackgroundBrush" Color="#1E293B" />
+            <SolidColorBrush x:Key="AppDisabledButtonBackgroundBrush" Color="#1E293B" />
+            <SolidColorBrush x:Key="AppDisabledButtonBorderBrush" Color="#334155" />
+            <SolidColorBrush x:Key="AppDisabledButtonForegroundBrush" Color="#94A3B8" />
+            <SolidColorBrush x:Key="AppDisabledBadgeBackgroundBrush" Color="#0F172A" />
+            <SolidColorBrush x:Key="AppDisabledBadgeForegroundBrush" Color="#94A3B8" />
+
+            <!-- Common Converters -->
+            <converters:StatusToColorConverter x:Key="StatusToColorConverter" />
+            <converters:StatusToVisibilityConverter x:Key="StatusToVisibilityConverter" />
+            <converters:LogLevelToBrushConverter x:Key="LogLevelToBrushConverter" />
+            <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
