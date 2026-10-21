@@ -58,7 +58,6 @@ graph TD
 - **Core Automation Engine:** Microsoft Windows Package Manager (`winget.exe`).
 - **Data Layer:** `System.Text.Json` deserialization over an extensible `apps.json` catalog.
 - **Test Suite:** xUnit test suite (`RigForge.Tests`) covering catalog integrity, package uniqueness, and model state management.
-- **Web Landing Page:** Modern React 19 + TypeScript + Tailwind CSS showcase located in `/website`.
 
 ---
 
@@ -115,10 +114,9 @@ RigForge/
 │   ├── DataTests.cs                # apps.json schema & ID validation
 │   └── SoftwarePackageTests.cs     # State transition & icon resolution tests
 │
-├── website/                        # Modern promotional landing page (React + Vite)
 ├── LaunchRigForge.bat              # Quick launcher batch script
 ├── RigForge.sln                    # Visual Studio / .NET Solution
-├── .gitignore                      # Standard .NET & Web exclusions
+├── .gitignore                      # Standard .NET exclusions
 ├── LICENSE                         # MIT License
 └── README.md                       # Project documentation
 ```

@@ -24,6 +24,10 @@
 startup_error.log
 crash.log
 
+# Website & Website Launcher (Excluded from GitHub)
+website/
+LaunchWebsite.bat
+
 # Node & Frontend (website)
 node_modules/
 */node_modules/

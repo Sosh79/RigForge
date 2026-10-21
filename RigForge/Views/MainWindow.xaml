@@ -139,15 +139,41 @@
                         </StackPanel>
                     </ui:Button>
 
-                    <ui:Button Command="{Binding UpgradeAllCommand}"
+                    <ui:Button x:Name="UpdateMenuBtn"
                                Appearance="Secondary"
                                Margin="0,0,8,0"
                                Padding="12,8"
-                               ToolTip="Run silent bulk upgrade on all installed Windows apps">
+                               Click="UpdateMenuBtn_Click"
+                               ToolTip="Choose to update RigForge catalog apps or all PC apps">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="🚀 " FontSize="12" />
-                            <TextBlock Text="Update All Apps" FontWeight="Medium" Foreground="{DynamicResource AppTextPrimaryBrush}" />
+                            <TextBlock Text="Update Apps" FontWeight="Medium" Foreground="{DynamicResource AppTextPrimaryBrush}" />
+                            <TextBlock Text=" ▾" FontSize="11" Margin="4,0,0,0" Foreground="{DynamicResource AppTextSecondaryBrush}" />
                         </StackPanel>
+                        <ui:Button.ContextMenu>
+                            <ContextMenu Background="{DynamicResource AppCardBackgroundBrush}" 
+                                         BorderBrush="{DynamicResource AppCardBorderBrush}"
+                                         BorderThickness="1"
+                                         Padding="4">
+                                <MenuItem Header="Update RigForge Apps Only" 
+                                          Command="{Binding UpgradeCatalogAppsCommand}"
+                                          Padding="10,6"
+                                          Foreground="{DynamicResource AppTextPrimaryBrush}">
+                                    <MenuItem.Icon>
+                                        <TextBlock Text="⚡" FontSize="13" />
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                                <Separator Background="{DynamicResource AppCardBorderBrush}" Margin="4,3" />
+                                <MenuItem Header="Update All PC Apps (Full System)" 
+                                          Command="{Binding UpgradeAllCommand}"
+                                          Padding="10,6"
+                                          Foreground="{DynamicResource AppTextPrimaryBrush}">
+                                    <MenuItem.Icon>
+                                        <TextBlock Text="🌐" FontSize="13" />
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                            </ContextMenu>
+                        </ui:Button.ContextMenu>
                     </ui:Button>
 
                     <Button Command="{Binding InstallSelectedCommand}"

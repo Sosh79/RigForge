@@ -71,6 +71,7 @@ public class MainViewModel : ObservableObject
             {
                 (InstallSelectedCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
                 (UpgradeAllCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
+                (UpgradeCatalogAppsCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
                 (ScanInstalledCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
                 (CancelCommand as RelayCommand)?.RaiseCanExecuteChanged();
             }
@@ -130,6 +131,7 @@ public class MainViewModel : ObservableObject
     public ICommand SelectCategoryCommand { get; }
     public ICommand InstallSelectedCommand { get; }
     public ICommand UpgradeAllCommand { get; }
+    public ICommand UpgradeCatalogAppsCommand { get; }
     public ICommand ScanInstalledCommand { get; }
     public ICommand InstallSingleCommand { get; }
     public ICommand CancelCommand { get; }
@@ -160,6 +162,7 @@ public class MainViewModel : ObservableObject
 
         InstallSelectedCommand = new AsyncRelayCommand(InstallSelectedAsync, () => !IsBusy && SelectedCount > 0);
         UpgradeAllCommand = new AsyncRelayCommand(UpgradeAllAsync, () => !IsBusy);
+        UpgradeCatalogAppsCommand = new AsyncRelayCommand(UpgradeCatalogAppsAsync, () => !IsBusy);
         ScanInstalledCommand = new AsyncRelayCommand(ScanInstalledAsync, () => !IsBusy);
         InstallSingleCommand = new AsyncRelayCommand(async param =>
         {
@@ -477,6 +480,76 @@ public class MainViewModel : ObservableObject
         {
             AddLog($"Bulk upgrade error: {ex.Message}", LogLevel.Error);
             StatusMessage = "Upgrade failed.";
+        }
+        finally
+        {
+            IsIndeterminate = false;
+            IsBusy = false;
+            _ = ScanInstalledAsync();
+        }
+    }
+
+    public async Task UpgradeCatalogAppsAsync()
+    {
+        if (IsBusy) return;
+
+        var installedPackages = AllPackages.Where(p => p.IsInstalled).ToList();
+        if (installedPackages.Count == 0)
+        {
+            AddLog("No RigForge catalog applications are currently detected as installed on this PC.", LogLevel.Warning);
+            StatusMessage = "No catalog apps found to upgrade.";
+            return;
+        }
+
+        IsBusy = true;
+        IsLogVisible = true;
+        _cts = new CancellationTokenSource();
+        ProgressValue = 0;
+        IsIndeterminate = false;
+
+        AddLog($"Initiating upgrade for {installedPackages.Count} RigForge catalog applications...", LogLevel.Info);
+        int updated = 0;
+        int total = installedPackages.Count;
+
+        try
+        {
+            for (int i = 0; i < total; i++)
+            {
+                if (_cts.Token.IsCancellationRequested) break;
+
+                var pkg = installedPackages[i];
+                pkg.Status = PackageStatus.Upgrading;
+                pkg.StatusMessage = "Upgrading...";
+                StatusMessage = $"Upgrading {pkg.Name} ({i + 1}/{total})...";
+
+                bool ok = await _wingetService.UpgradePackageAsync(pkg.Id, (msg, level) => AddLog(msg, level), _cts.Token);
+                if (ok)
+                {
+                    pkg.Status = PackageStatus.Installed;
+                    pkg.StatusMessage = "Up to date";
+                    updated++;
+                }
+                else
+                {
+                    pkg.Status = PackageStatus.Failed;
+                    pkg.StatusMessage = "Upgrade failed";
+                }
+
+                ProgressValue = ((double)(i + 1) / total) * 100.0;
+            }
+
+            StatusMessage = $"Completed upgrading RigForge apps ({updated}/{total} processed).";
+            AddLog($"RigForge catalog upgrade finished: {updated} of {total} apps processed.", LogLevel.Success);
+        }
+        catch (OperationCanceledException)
+        {
+            AddLog("RigForge catalog upgrade cancelled by user.", LogLevel.Warning);
+            StatusMessage = "Upgrade operation cancelled.";
+        }
+        catch (Exception ex)
+        {
+            AddLog($"RigForge catalog upgrade error: {ex.Message}", LogLevel.Error);
+            StatusMessage = "Upgrade error.";
         }
         finally
         {

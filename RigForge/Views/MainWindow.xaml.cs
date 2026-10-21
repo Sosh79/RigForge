@@ -32,6 +32,16 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         _viewModel.Logs.CollectionChanged += Logs_CollectionChanged;
     }
 
+    private void UpdateMenuBtn_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement element && element.ContextMenu != null)
+        {
+            element.ContextMenu.PlacementTarget = element;
+            element.ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+            element.ContextMenu.IsOpen = true;
+        }
+    }
+
     private void Logs_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (e.Action == NotifyCollectionChangedAction.Add && _viewModel.IsLogVisible)
